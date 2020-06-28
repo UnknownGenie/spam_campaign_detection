@@ -1,0 +1,5 @@
+contentType,charset,emailLayoutHtml,emailLayoutText,embeddedURLs_netloc,embeddedURLs_path,embeddedURLs_params,originDomain,originSourceIP,language,originEmailAddress,originName,subject,originDate,attachments,id
+None,None,None,None,None,/help/policies/hub.html,None,None,None,None,aw-confirm@eBay.com,None,None,None,None,"1, 2"
+multipart/alternative,"iso-8859-1, iso-8859-1",None,None,"pages.ebay.com, cgi4.ebay.com","/help/policies/privacy-policy.html, /help/policies/user-agreement.html",None,"ebay.com, ebay.com",None,"None, en",aw-confirm@eBay.com,None,None,None,None,6
+None,None,None,T,None,None,None,ncua.gov,67.18.167.138,en,acc-validity@ncua.gov,NCUA,System maintenance: update your Federal Credit Union,None,None,"3, 8"
+text/html,iso-8859-1,None,"T, T",www.ncua.gov,None,None,"ncua.gov, ebay.com",67.18.167.138,"None, en",acc-validity@ncua.gov,NCUA,System maintenance: update your Federal Credit Union,None,None,"5, 4"

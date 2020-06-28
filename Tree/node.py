@@ -146,11 +146,19 @@ class FPNode(object):
             temp_node=temp_node.parent
 
         return False
+    
     def cond4(self,min_num_messages):
         return self.num_leaves>=min_num_messages
 
+    def cond5(self, features):
+        return self.item.split(":")[-1] in features
+    
     def cond(self,param):
-        return self.cond1(param[0]) and self.cond2(param[1]) and self.cond3(param[2]) and self.cond4(param[3])
+        return (self.cond1(param[0]) 
+                and self.cond2(param[1]) 
+                and self.cond3(param[2]) 
+                and self.cond4(param[3])
+                and self.cond5(param[4]))
 
     def get_items(self,items):
         items.append(self.item)
@@ -171,7 +179,7 @@ class FPNode(object):
         if self.cond(param):
             self.parent.remove(self)
             campaign.append(self)
-            print(campaign[-1].item)
+            # print(campaign[-1].item)
             return        
         
 

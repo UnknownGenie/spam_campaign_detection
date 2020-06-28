@@ -138,7 +138,6 @@ class FPTree(object):
                 print("    %r" % node)
 
     def getcampaign(self,param):
-#         print(self.header_table)
         campaign=[]
         self.root.dfs(param,campaign)
         itemlist=[]
