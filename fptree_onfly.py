@@ -92,7 +92,7 @@ def parse(path="data"):
 def defdict(dicts):
     return defaultdict(lambda: 0, dicts)
 
-def export_csv():
+def export_csv(campaigns):
     columns = ['contentType', 'charset', 'emailLayoutHtml', 'emailLayoutText', 
             'embeddedURLs_netloc', 'embeddedURLs_path', 'embeddedURLs_params',
             'originDomain', 'originSourceIP', 
