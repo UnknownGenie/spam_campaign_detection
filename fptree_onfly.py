@@ -32,17 +32,22 @@ def parse(path="data"):
             json_dict = json.load(f)
         
         for feature in features:
+            if isinstance(json_dict[feature], str):
+                if (not json_dict[feature]) or (json_dict[feature] == "None"):
+                    continue
             if feature == 'readability':
-                temp = json_dict.get(feature, "None")
+                temp = json_dict.get(feature, None)
                 if isinstance(temp, dict):
-                    content = temp.get('contentType', "None")
-                    charset = temp.get('charset', "None")
-                    data += ["{}:contentType".format(content),
-                             "{}:charset".format(charset)] 
+                    content = temp.get('contentType', None)
+                    charset = temp.get('charset', None)
+                    if content:
+                        data += ["{}:contentType".format(content)]
+                    if charset:
+                        data += ["{}:charset".format(charset)] 
                 continue
             
             if feature == 'embeddedURLs':
-                urls = json_dict.get(feature, "None")
+                urls = json_dict.get(feature, None)
                 if isinstance(urls, list):
                     for item in urls:
                         tokens =urlparse(item['url'])
@@ -54,12 +59,16 @@ def parse(path="data"):
                 continue
             if feature == 'emailLayoutHtml':
                 if json_dict['readability']['contentType'] == "multipart/alternative":
-                    data += ['{}:{}'.format(json_dict[feature], feature)]
+                    val = json_dict.get(feature, None)
+                    if val:
+                        data += ['{}:{}'.format(val, feature)]
                 continue 
             
             if feature == 'emailLayoutText':
                 if json_dict['readability']['contentType'] != "multipart/alternative":
-                    data += ['{}:{}'.format(json_dict[feature], feature)]                
+                    val = json_dict.get(feature, None)
+                    if val:
+                        data += ['{}:{}'.format(val, feature)]
                 continue
         
             # if feature == 'top10simpleWord':
@@ -72,15 +81,16 @@ def parse(path="data"):
             #     continue
 
             if feature == 'attachments':
-                attached = json_dict.get(feature, "None")
+                attached = json_dict.get(feature, None)
                 if not isinstance(attached, list):
                     for attachment in attached:
-                        filename = attachment.get('fileName', "None")
-                        data+=['{}:{}'.format(filename, feature)]
+                        filename = attachment.get('fileName', None)
+                        if filename:
+                            data+=['{}:{}'.format(filename, feature)]
                 continue
             # All other features are handled there other than mentioned and checked above
-            val = json_dict.get(feature, "None")
-            if val == "":
+            val = json_dict.get(feature, None)
+            if not val:
                 continue
             data += ["{}:{}".format(val, feature)]
         tid+=1
@@ -93,7 +103,7 @@ def defdict(dicts):
     return defaultdict(lambda: 0, dicts)
 
 def export_csv(campaigns):
-    columns = ['contentType', 'charset', 'emailLayoutHtml', 'emailLayoutText', 
+    columns = ['campaignName', 'id', 'contentType', 'charset', 'emailLayoutHtml', 'emailLayoutText', 
             'embeddedURLs_netloc', 'embeddedURLs_path', 'embeddedURLs_params',
             'originDomain', 'originSourceIP', 
             'language', 'originEmailAddress', 'originName', 
@@ -102,8 +112,10 @@ def export_csv(campaigns):
     for i, campaign in enumerate(campaigns):
         # print(campaign)
         row = dict()
+        # change to item[0]
+        row['campaignName'] = campaign[0]
         multiline_column = []
-        for item in campaign:
+        for item in campaign[1:]:
             parts = item.split(":")
             key = parts[-1]
             
@@ -140,7 +152,7 @@ def find_frequent_itemsets(transactions, minimum_support, params, include_suppor
         minimum_support = minimum_support * len(transactions)
     
     # onflytran=transactions[len(transactions)//2:]
-    transactions=transactions[:len(transactions)//2]
+    transactions=transactions
     items = defaultdict(lambda: 0)  # mapping from items to their supports
 
     # if using support rate instead of support count
@@ -160,19 +172,20 @@ def find_frequent_itemsets(transactions, minimum_support, params, include_suppor
     # Remove infrequent items from the item support dictionary and
     #sorts the dictionary  according to value
     items= defdict({k: v for k, v in 
-                   sorted(items.items(), 
+                    sorted(items.items(), 
                           key=lambda item: item[1], 
                           reverse=True) \
-                   if v >= minimum_support or \
-                   k.split(":")[1] == 'id'or \
-                   k.split(":")[1] == 'content'})
+                    if v >= minimum_support or \
+                    k.split(":")[1] == 'id'or \
+                    k.split(":")[1] == 'content'})
     # Build our FP-tree. Before any transactions can be added to the tree, they
     # must be stripped of infrequent items and their surviving items must be
     # sorted in decreasing order of frequency.
     
     master = FPTree(items)
-    print(master.inspect())
+    # print(master.inspect())
     master.add(transactions,on_fly = False)
+    # print(master.inspect())
     # Tree is built
 
     # while True:
@@ -187,7 +200,13 @@ def find_frequent_itemsets(transactions, minimum_support, params, include_suppor
     return master.getcampaign(params)
 
 dataset = parse("data")
-# print(dataset)
+# dataset = [['F,A,C,D,G,I,M,P'],
+#             ['A,B,C,F,L,M,O'],
+#             ['B,F,H,J,O'],
+#             ['B,C,K,S,P'],
+#             ['A,F,C,E,L,P,M,N']]
+# dataset = [[item + ':test' for item in data[0].split(",")] for data in dataset]
+# print(len(dataset))
 features_to_check = ['embeddedURLs_path', 'contentType', 'language']
 param=[1,1,[],1, features_to_check]
 

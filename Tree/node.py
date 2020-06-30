@@ -11,6 +11,7 @@ class FPNode(object):
         self._children = {}
         self._neighbor = None
         self._num_leaves=None
+        self.is_merged = False
 
 
     @property
@@ -25,7 +26,31 @@ class FPNode(object):
         if child.item not in self._children:
             self._children[child.item] = child
             child.parent = self
-
+    def swap(self, node):
+        _ = node.parent._children.pop(node.item)
+        node.parent.add(self)
+        
+        temp = node.parent
+        node.parent = self
+        self.parent = temp
+        
+        _ = node._children.pop(self.item)
+        for child in self.children:
+            if not child.is_merged:
+                node_to_add = self._children.pop(child.item)
+                node_to_add.parent = node
+                node.add(node_to_add)
+        self.add(node)
+        
+        temp = self._neighbor
+        self._neighbor = node._neighbor
+        node._neighbor = temp
+        
+        temp = self._num_leaves
+        self._num_leaves=node._num_leaves
+        node._num_leaves = temp
+        
+        return self.tree
     def remove(self, child):
         """Remove the given FPNode `child` as a child of this node."""
 
@@ -44,11 +69,8 @@ class FPNode(object):
         Check whether this node contains a child node for the given item.
         If so, that node is returned; otherwise, `None` is returned.
         """
-        try:
-            return self._children[item]
-        except KeyError:
-            return None
-
+        return self._children.get(item, None)
+       
     def __contains__(self, item):
         return item in self._children
 
@@ -157,8 +179,8 @@ class FPNode(object):
         return (self.cond1(param[0]) 
                 and self.cond2(param[1]) 
                 and self.cond3(param[2]) 
-                and self.cond4(param[3])
-                and self.cond5(param[4]))
+                and self.cond4(param[3]))
+                # and self.cond5(param[4]))
 
     def get_items(self,items):
         items.append(self.item)
