@@ -14,7 +14,6 @@ from Utils.data import export_csv, get_config
 
 from Watch.ops import init_Observer, stop_Observer
 
-
 def update_buffer_status():
     return not is_buffer_full
      
@@ -45,14 +44,14 @@ while True:
             print(f"No of camp. is {len(campaigns)}")
             df = export_csv(campaigns, columns)
             handler.buffer_full = False
+    
     except KeyboardInterrupt:
         print("Exiting...")
-        stop_Observer(observer)
-        sys.exit()
+    
     except Exception as e:
-        print("Follwoing error encountered")
+        print("Following error encountered")
         print(e)
         print("Exiting...")
-        stop_Observer(observer)
-        sys.exit()
-        
+
+stop_Observer(observer)
+sys.exit()
