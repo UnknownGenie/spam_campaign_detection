@@ -1,0 +1,44 @@
+{
+    "columns": [
+        "campaignName",
+        "id",
+        "contentType",
+        "charset",
+        "emailLayoutHtml",
+        "emailLayoutText",
+        "embeddedURLs_netloc",
+        "embeddedURLs_path",
+        "embeddedURLs_params",
+        "originDomain",
+        "originSourceIP",
+        "language",
+        "originEmailAddress",
+        "originName",
+        "subject",
+        "originDate",
+        "attachments"
+    ],
+    "features": [
+        "readability",
+        "emailLayoutHtml",
+        "emailLayoutText",
+        "embeddedURLs",
+        "originDomain",
+        "originSourceIP",
+        "language",
+        "originEmailAddress",
+        "originName",
+        "subject",
+        "originDate",
+        "attachments"
+    ],
+    "features_to_check": [
+        "embeddedURLs_path",
+        "contentType",
+        "language"
+    ],
+    "freq_threshold": 1,
+    "min_num_children": 1,
+    "min_num_messages": 1,
+    "obf_features": []
+}

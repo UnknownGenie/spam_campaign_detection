@@ -21,7 +21,6 @@ class FPTree(object):
         # "neighbors" that will hit every node containing that item.
         self._routes = {}
         self._header_table=items
-        self._last_merged = self._root
 
         
 
@@ -40,77 +39,31 @@ class FPTree(object):
         """The root node of the tree."""
         return self._root
     
-    def swap_required(self, node):
-        if node.parent == self.root:
-            return False
-        
-        all_childs_count = 0
-        for child in node.children:
-            all_childs_count += child.count
-        
-        if node.parent.count <= all_childs_count:
-            return True
-        else:
-            return False  
-        
-    def add_on_fly(self, transaction, start_node = None):
-        if not start_node:
-            start_node = self.root
-            self._last_merged = self.root
-        
-        if start_node.children:
-            for child in start_node.children:
-                if child.item in transaction:
-                    child.increment()
-                    transaction.remove(child.item)
-                    self._last_merged = child
-                    
-                    if self.swap_required(child):
-                        while self.swap_required(child):
-                            self.tree = child.swap(child.parent)
-                            
-                transaction = self.add_on_fly(transaction, child)
-        if transaction:
-            self.add_traditional(transaction, self._last_merged)
-            transaction = []
-            return transaction 
-        return transaction
-        
-    def add_traditional(self, transaction, start_node):
-        """Add a transaction to the tree."""
-        point = start_node
-        for item in transaction:
-            next_point = point.search(item)
-            if next_point:
-                # There is already a node in this tree for the current
-                # transaction item; reuse it.
-                next_point.increment()
-            else:
-                # Create a new point and add it as a child of the point we're
-                # currently looking at.
-                next_point = FPNode(self, item)
-                point.add(next_point)
-
-                # Update the route of nodes that contain this item to include
-                # our new node.
-                self._update_route(next_point)
-            point = next_point
+    
         
     def add(self,transactions, on_fly = True):
         if all(isinstance(i, list) for i in transactions):
             for transaction in transactions:
-                if on_fly:
-                    print(transaction)
-                    _= self.add_on_fly(transaction)
-                else:
-                    id,content=transaction[-1],transaction[0]
-                    transaction=[content]+[k for k,v in self.header_table.items() 
-                                       if k in transaction[1:-1]]+[id]
+                id,content=transaction[-1],transaction[0]
+                transaction=[content]+[k for k,v in self.header_table.items() 
+                                   if k in transaction[1:-1]]+[id]
+                point = self.root
+                for item in transaction:
+                    next_point = point.search(item)
+                    if next_point:
+                        # There is already a node in this tree for the current
+                        # transaction item; reuse it.
+                        next_point.increment()
+                    else:
+                        # Create a new point and add it as a child of the point we're
+                        # currently looking at.
+                        next_point = FPNode(self, item)
+                        point.add(next_point)
         
-                    self.add_traditional(transaction, self._root)
-        else:
-            print("provide transaction as list")
-
+                        # Update the route of nodes that contain this item to include
+                        # our new node.
+                        self._update_route(next_point)
+                    point = next_point
     
 
     def _update_route(self, point):
