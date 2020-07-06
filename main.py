@@ -13,10 +13,16 @@ from Utils.parser import parse
 from Utils.data import export_csv, get_config
 
 from Watch.ops import init_Observer, stop_Observer
-
-def update_buffer_status():
-    return not is_buffer_full
      
+
+def create_tree():
+    dataset = parse(path_to_messages_read, features)
+    campaigns = find_frequent_itemsets(dataset,
+                                       min_support,
+                                       param)
+    print(f"No of camp. is {len(campaigns)}")
+    _ = export_csv(campaigns, columns, csv_path)
+
 config = get_config('config.json')
 
 param=[config['min_num_children'],
@@ -27,31 +33,27 @@ param=[config['min_num_children'],
 
 features = config['features']
 columns = config['columns']
-
-is_buffer_full = False
-
-path_to_messages_read = os.path.join("data", "read")
-path_to_messages_unread = os.path.join("data", "unread")
+path_to_messages_read = config['dest_path']
+path_to_messages_unread = config['src_path']
+min_support = config['min_support']
+csv_path = config['csv_path']
 
 observer, handler = init_Observer(path_to_messages_unread)
+create_tree()
 print("Initialized...")
 while True:
     try:
         if handler.buffer_full:
-            print("Executing tree ops")
-            dataset = parse(path_to_messages_read, features)
-            campaigns = find_frequent_itemsets(dataset,2,param)
-            print(f"No of camp. is {len(campaigns)}")
-            df = export_csv(campaigns, columns)
+            create_tree()
             handler.buffer_full = False
     
     except KeyboardInterrupt:
         print("Exiting...")
-    
+        break
     except Exception as e:
         print("Following error encountered")
         print(e)
         print("Exiting...")
-
+        break
 stop_Observer(observer)
 sys.exit()

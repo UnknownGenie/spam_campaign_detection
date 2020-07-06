@@ -12,7 +12,7 @@ def get_config(filename):
         config = json.load(f)
     return config
 
-def export_csv(campaigns, columns):
+def export_csv(campaigns, columns, output_path):
     df = pd.DataFrame(columns = columns)
     for i, campaign in enumerate(campaigns):
         # print(campaign)
@@ -38,5 +38,5 @@ def export_csv(campaigns, columns):
         row = pd.DataFrame(row, index = [0])
         df = pd.concat((df, row), ignore_index = True)
     df = df.fillna("None")
-    df.to_csv("Campaigns.csv", index=False)
+    df.to_csv(output_path, index=False)
     return df

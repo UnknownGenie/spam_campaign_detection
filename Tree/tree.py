@@ -41,7 +41,7 @@ class FPTree(object):
     
     
         
-    def add(self,transactions, on_fly = True):
+    def add(self,transactions):
         if all(isinstance(i, list) for i in transactions):
             for transaction in transactions:
                 id,content=transaction[-1],transaction[0]

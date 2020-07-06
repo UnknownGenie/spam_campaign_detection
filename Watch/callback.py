@@ -8,14 +8,17 @@ import watchdog.events
 import shutil
 import os
 
+from Utils.data import get_config
+
 class Handler(watchdog.events.PatternMatchingEventHandler): 
-    def __init__(self, threshold = 5): 
+    def __init__(self): 
         # Set the patterns for PatternMatchingEventHandler 
-        watchdog.events.PatternMatchingEventHandler.__init__(self, #patterns=['*.json'], 
+        watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.json'], 
                                                              ignore_directories=True, case_sensitive=False) 
-        self.dest_dir = os.path.join("data", "read") 
-        self.src_dir = os.path.join("data", "unread")
-        self.threshold = threshold
+        config = get_config('config.json')
+        self.src_dir = config['src_path'] 
+        self.dest_dir = config['dest_path']
+        self.threshold = config['threshold']
         self.buffer_full = False
         
     def on_created(self, event): 

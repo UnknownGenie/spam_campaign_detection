@@ -58,7 +58,7 @@ def find_frequent_itemsets(transactions, minimum_support, params, include_suppor
     
     master = FPTree(items)
     # print(master.inspect())
-    master.add(transactions,on_fly = False)
+    master.add(transactions)
     # print(master.inspect())
     # Tree is built
 
